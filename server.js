@@ -13,7 +13,7 @@ var connection = mysql.createConnection({
 
   // Your password
   password: "73BuickRegal",
-  database: "employee_db"
+  database: "EmployeeTrackerDB"
 });
 
 // connect to the mysql server and sql database
@@ -24,37 +24,250 @@ connection.connect(function(err) {
   });
 
 
-  // function which prompts the user for what action they should take
+// function which prompts the user for what action they should take
 function start() {
+    console.log("WELCOME TO EMPLOYEE TRACKER");
     inquirer
     .prompt({
       name: "chooseAction",
       type: "list",
       message: "Would you like to do? (use arrow keys)",
-      choices: ["View all employees", "View all employees by department", "View all employees by manager",
-      "Add employee", "Remove Employee", "Update employee role", "Update Employee manager", "exit"]
+      choices: ["View all employees", "View all employees by department", "View All Departments", "Add New Job Role",
+      "Add employee", "Remove Employee", "Add Department", "Remove Department", "Update employee role", "Update Employee manager", "exit"]
     })
     .then(function(answer) {
         // based on their answer, either call the bid or the post functions
         if (answer.chooseAction === "View all employees") {
-          viewAll();
+            viewAllEmployees();
         }
-        else if(answer.postOrBid === "View all employees by department") {
-            viewAllByDept();
-        } else{
+        else if(answer.chooseAction === "Add employee") {
+            addEmployee();
+        } 
+        else if(answer.chooseAction === "Remove employee") {
+            removeEmployee();
+        }
+        else if(answer.chooseAction === "View All Departments") {
+            viewDepartments();
+        } 
+        else if(answer.chooseAction === "Add New Job Role") {
+            addRole();
+        } 
+        else if(answer.chooseAction === "Add Department") {
+            addDepT();
+        }
+        else {
           connection.end();
         }
       });
 }
+// END OF MAIN START FUNCTION
 
-function viewAll() {
-    connection.query(
-        "INSERT INTO auctions SET ?",
-        {
-          item_name: answer.item,
-          category: answer.category,
-          starting_bid: answer.startingBid || 0,
-          highest_bid: answer.startingBid || 0
+// VIEW ALL EMPLOYEES FUNCTION
+function viewAllEmployees() {
+    //console.log("View all Employees");
+    connection.query("SELECT * FROM EmployeeTrackerDB.employee", function (err, res) {
+        if (err) throw err;
+        for (let i = 0; i < res.length; i++) {
+            console.log(
+                " First Name: " +
+                res[i].first_name +
+                " || Last Name: " +
+                res[i].last_name +
+                " || Role Id: " +
+                res[i].role_id +
+                "||  Manager Id: " +
+                res[i].manager_id
+            );
         }
-      );
+    });
+    start();
 }
+// END OF VIEW ALL EMPLOYEES FUNCTION
+
+// VIEW ALL DEPARTMENTS FUNCTION
+function viewDepartments() {
+    connection.query("SELECT * FROM EmployeeTrackerDB.department", function (err, res) {
+        if (err) throw err;
+        console.log("")
+        console.log ("All Departments");
+        console.log("===============================");
+        for (let i = 0; i < res.length; i++) {
+            console.log(
+                " id: " +
+                res[i].id +
+                " || Department: " +
+                res[i].dept_name
+            );
+        }
+    });
+    start();
+}
+// END OF VIEW ALL DEPARTMENTS FUNCTION
+
+// ADD EMPLOYEE FUNCTION
+function addEmployee() {
+    inquirer
+    .prompt([
+      {
+        name: "fname",
+        type: "input",
+        message: "Enter New Employee First Name"
+      },
+      {
+        name: "lname",
+        type: "input",
+        message: "Enter New Employee Last Name"
+      },
+      {
+        name: "roleID",
+        type: "input",
+        message: "Enter Role ID"
+      },
+      {
+        name: "managerID",
+        type: "input",
+        message: "Enter Manager ID"
+      }
+    ])
+    .then(function(answer) {
+        // when finished prompting, insert a new employee into the db with that info
+        connection.query(
+          "INSERT INTO employee SET ?",
+          {
+            first_name: answer.fname,
+            last_name: answer.lname,
+            role_id: answer.roleID,
+            manager_id: answer.managerID
+          },
+          function(err) {
+            if (err) throw err;
+            console.log("==============================");
+            console.log("New Employee Added successfully!");
+            console.log("==============================");
+            // re-prompt the user for if they want to do next
+            start();
+          }
+        );
+      });
+}
+// END OF ADD EMPLOYEE FUNCTION
+
+// REMOVE EMPLOYEE FUNCTION
+function removeEmployee() {
+    inquirer
+    .prompt([
+      {
+        name: "fname",
+        type: "input",
+        message: "Enter New Employee First Name"
+      },
+      {
+        name: "lname",
+        type: "input",
+        message: "Enter New Employee Last Name"
+      },
+      {
+        name: "roleID",
+        type: "input",
+        message: "Enter Role ID"
+      },
+      {
+        name: "managerID",
+        type: "input",
+        message: "Enter Manager ID"
+      }
+    ])
+    .then(function(answer) {
+        // when finished prompting, insert a new employee into the db with that info
+        connection.query(
+          "DELETE FROM employee WHERE first_name='answer.fname' ",
+          {
+            first_name: answer.fname,
+            last_name: answer.lname,
+            role_id: answer.roleID,
+            manager_id: answer.managerID
+          },
+          function(err) {
+            if (err) throw err;
+            console.log("==============================");
+            console.log("Employee Deleted successfully!");
+            console.log("==============================");
+            // re-prompt the user for if they want to do next
+            start();
+          }
+        );
+      });
+}
+// END OF REMOVE EMPLOYEE FUNCTION
+
+// ADD JOB ROLE FUNCTION
+function addRole() {
+    inquirer
+    .prompt([
+      {
+        name: "roleTitle",
+        type: "input",
+        message: "Enter Job Role Title"
+      },
+      {
+        name: "salary",
+        type: "input",
+        message: "Enter The Salary For This New Role"
+      },
+      {
+        name: "deptID",
+        type: "input",
+        message: "Enter Role ID"
+      }
+    ])
+    .then(function(answer) {
+        // when finished prompting, insert a new employee into the db with that info
+        connection.query(
+          "INSERT INTO role SET ?",
+          {
+            title: answer.roleTitle,
+            salary: answer.salary,
+            department_id: answer.deptID,
+          },
+          function(err) {
+            if (err) throw err;
+            console.log("==============================");
+            console.log("New Role Added successfully!");
+            console.log("==============================");
+            // re-prompt the user for if they want to do next
+            start();
+          }
+        );
+      });
+}
+// END OF ADD JOB ROLE FUNCTION
+
+// ADD NEW DEPARTMENT FUNCTION
+function addDepT() {
+    inquirer
+    .prompt([
+      {
+        name: "deptTitle",
+        type: "input",
+        message: "Enter New Deparment Name"
+      }
+    ])
+    .then(function(answer) {
+        // when finished prompting, insert a new employee into the db with that info
+        connection.query(
+          "INSERT INTO department SET ?",
+          {
+            dept_name: answer.deptTitle,
+          },
+          function(err) {
+            if (err) throw err;
+            console.log("==============================");
+            console.log("New Department Added successfully!");
+            console.log("==============================");
+            // re-prompt the user for if they want to do next
+            start();
+          }
+        );
+      });
+}
+// END OF ADD NEW DEPARTMENT FUNCTION
