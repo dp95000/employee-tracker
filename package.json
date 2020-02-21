@@ -23,6 +23,9 @@
   },
   "homepage": "https://github.com/dp95000/employee-tracker#readme",
   "dependencies": {
+    "chalk": "^3.0.0",
+    "clear": "^0.1.0",
+    "figlet": "^1.2.4",
     "inquirer": "^7.0.4",
     "mysql": "^2.18.1"
   }

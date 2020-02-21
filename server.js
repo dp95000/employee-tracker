@@ -1,6 +1,18 @@
 var mysql = require("mysql");
 var inquirer = require("inquirer");
 
+var figlet = require('figlet');
+var chalk = require("chalk");
+var clear = require("clear");
+
+clear();
+
+console.log(
+    chalk.magentaBright(
+      figlet.textSync("EMPLOYEE TRACKER", { standardLayout: "full" })
+    )
+  );
+
 // create the connection information for the sql database
 var connection = mysql.createConnection({
   host: "localhost",
@@ -26,7 +38,7 @@ connection.connect(function(err) {
 
 // function which prompts the user for what action they should take
 function start() {
-    console.log("WELCOME TO EMPLOYEE TRACKER");
+    
     inquirer
     .prompt({
       name: "chooseAction",
@@ -43,7 +55,7 @@ function start() {
         else if(answer.chooseAction === "Add employee") {
             addEmployee();
         } 
-        else if(answer.chooseAction === "Remove employee") {
+        else if(answer.chooseAction === "Remove Employee") {
             removeEmployee();
         }
         else if(answer.chooseAction === "View All Departments") {
@@ -157,42 +169,24 @@ function removeEmployee() {
     inquirer
     .prompt([
       {
-        name: "fname",
-        type: "input",
-        message: "Enter New Employee First Name"
-      },
-      {
         name: "lname",
         type: "input",
-        message: "Enter New Employee Last Name"
-      },
-      {
-        name: "roleID",
-        type: "input",
-        message: "Enter Role ID"
-      },
-      {
-        name: "managerID",
-        type: "input",
-        message: "Enter Manager ID"
+        message: "Enter Last Name of Employee You Want to Remove"
       }
     ])
     .then(function(answer) {
         // when finished prompting, insert a new employee into the db with that info
         connection.query(
-          "DELETE FROM employee WHERE first_name='answer.fname' ",
+          "DELETE FROM employee WHERE ?",
           {
-            first_name: answer.fname,
-            last_name: answer.lname,
-            role_id: answer.roleID,
-            manager_id: answer.managerID
+            //first_name: answer.fname,
+            last_name: answer.lname
           },
           function(err) {
             if (err) throw err;
             console.log("==============================");
             console.log("Employee Deleted successfully!");
             console.log("==============================");
-            // re-prompt the user for if they want to do next
             start();
           }
         );
