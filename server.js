@@ -44,8 +44,8 @@ function start() {
       name: "chooseAction",
       type: "list",
       message: "Would you like to do? (use arrow keys)",
-      choices: ["View all employees", "View all employees by department", "View All Departments", "Add New Job Role",
-      "Add employee", "Remove Employee", "Add Department", "Remove Department", "Update employee role", "Update Employee manager", "exit"]
+      choices: ["View all employees", "View all Job Roles", "View All Departments", "Add New Job Role",
+      "Add employee", "Remove Employee", "Add Department", "Remove Department", "Update employee role", "Update Employee manager", "Exit"]
     })
     .then(function(answer) {
         // based on their answer, either call the bid or the post functions
@@ -61,11 +61,20 @@ function start() {
         else if(answer.chooseAction === "View All Departments") {
             viewDepartments();
         } 
+        else if(answer.chooseAction === "View all Job Roles") {
+            viewRoles();
+        } 
         else if(answer.chooseAction === "Add New Job Role") {
             addRole();
         } 
         else if(answer.chooseAction === "Add Department") {
-            addDepT();
+            addDept();
+        }
+        else if(answer.chooseAction === "Remove Department") {
+            removeDept();
+        }
+        else if(answer.chooseAction === "Update employee role") {
+            updateEmployee();
         }
         else {
           connection.end();
@@ -76,7 +85,9 @@ function start() {
 
 // VIEW ALL EMPLOYEES FUNCTION
 function viewAllEmployees() {
-    //console.log("View all Employees");
+    console.log("")
+    console.log ("All Current Employess");
+    console.log("===============================");
     connection.query("SELECT * FROM EmployeeTrackerDB.employee", function (err, res) {
         if (err) throw err;
         for (let i = 0; i < res.length; i++) {
@@ -116,8 +127,41 @@ function viewDepartments() {
 }
 // END OF VIEW ALL DEPARTMENTS FUNCTION
 
+// REMOVE DEPARMENT FUNCTION
+function removeDept() {
+    inquirer
+    .prompt([
+      {
+        name: "deptartment",
+        type: "input",
+        message: "Enter Name of Deparment You Want to Remove"
+      }
+    ])
+    .then(function(answer) {
+        // when finished prompting, insert a new employee into the db with that info
+        connection.query(
+          "DELETE FROM department WHERE ?",
+          {
+            //first_name: answer.fname,
+            dept_name: answer.deptartment
+          },
+          function(err) {
+            if (err) throw err;
+            console.log("==============================");
+            console.log("Department Deleted successfully!");
+            console.log("==============================");
+            start();
+          }
+        );
+      });
+}
+// END OF REMOVE DEPARTMENT FUNCTION
+
 // ADD EMPLOYEE FUNCTION
 function addEmployee() {
+    console.log("")
+    console.log ("Add New Employee");
+    console.log("===============================");
     inquirer
     .prompt([
       {
@@ -166,6 +210,9 @@ function addEmployee() {
 
 // REMOVE EMPLOYEE FUNCTION
 function removeEmployee() {
+    console.log("")
+    console.log ("Remove Employee");
+    console.log("===============================");
     inquirer
     .prompt([
       {
@@ -196,6 +243,9 @@ function removeEmployee() {
 
 // ADD JOB ROLE FUNCTION
 function addRole() {
+    console.log("")
+    console.log ("Add New Job Role");
+    console.log("===============================");
     inquirer
     .prompt([
       {
@@ -237,7 +287,10 @@ function addRole() {
 // END OF ADD JOB ROLE FUNCTION
 
 // ADD NEW DEPARTMENT FUNCTION
-function addDepT() {
+function addDept() {
+    console.log("")
+    console.log ("Add New Department");
+    console.log("===============================");
     inquirer
     .prompt([
       {
@@ -265,3 +318,82 @@ function addDepT() {
       });
 }
 // END OF ADD NEW DEPARTMENT FUNCTION
+
+// VIEW ALL DEPARTMENTS FUNCTION
+function viewRoles() {
+    console.log("");
+    console.log ("All Current Job Titles");
+    console.log("===============================");
+    connection.query("SELECT * FROM EmployeeTrackerDB.role", function (err, res) {
+        if (err) throw err;
+        for (let i = 0; i < res.length; i++) {
+            console.log(
+                " Id: " +
+                res[i].id +
+                " || Title: " +
+                res[i].title +
+                " || Salary: " + res[i].salary +
+                "|| Department Id: " + res[i].department_id
+            );
+        }
+    });
+    start();
+}
+// END OF VIEW ALL DEPARTMENTS FUNCTION
+
+
+// UPDATE EMPLOYEE FUNCTION
+function updateEmployee() {
+    console.log("")
+    console.log ("Update Employee Job Roles");
+    console.log("===============================");
+    inquirer
+    .prompt([
+      {
+        name: "fname",
+        type: "input",
+        message: "Enter employee's first name"
+      },
+      {
+        name: "lname",
+        type: "input",
+        message: "Enter employee's last name"
+      },
+      {
+        name: "currentRole",
+        type: "input",
+        message: "Enter this employee's current job role"
+      },
+      {
+        name: "newRole",
+        type: "input",
+        message: "Enter this employee's new job role"
+      }
+    ])
+    .then(function(answer) {
+        // when finished prompting, insert a new employee into the db with that info
+        connection.query(
+          "UPDATE employee SET ? WHERE ? AND ?",
+          [
+         {
+                role_id: parseInt(answer.newRole)
+        },
+          {
+            first_name: answer.fname
+          },
+          {
+            last_name: answer.lname
+          }
+        ],
+          function(err) {
+            if (err) throw err;
+            console.log("==============================");
+            console.log("Employee Updated successfully!");
+            console.log("==============================");
+            // re-prompt the user for if they want to do next
+            start();
+          }
+        );
+      });
+}
+// END OF UPDATE EMPLOYEE FUNCTION
