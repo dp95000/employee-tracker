@@ -330,7 +330,7 @@ function viewRoles() {
                 res[i].id +
                 " || Title: " +
                 res[i].title +
-                " || Salary: " + res[i].salary +
+                " || Salary: $" + res[i].salary +
                 "|| Department Id: " + res[i].department_id
             );
         }

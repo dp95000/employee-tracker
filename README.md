@@ -17,5 +17,5 @@ Once you've successfully completed the setup of your mySQL database, you will ne
 # Operation
 Once you've completed all the setup instructions, and downloaded all required Node dependencies, you can run this application by typing the following command:
 
-node start
+npm start
 
