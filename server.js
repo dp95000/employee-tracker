@@ -45,7 +45,7 @@ function start() {
       type: "list",
       message: "Would you like to do? (use arrow keys)",
       choices: ["View all employees", "View all Job Roles", "View All Departments", "Add New Job Role",
-      "Add employee", "Remove Employee", "Add Department", "Remove Department", "Update employee role", "Update Employee manager", "Exit"]
+      "Add employee", "Remove Employee", "Add Department", "Remove Department", "Update employee role", "Exit"]
     })
     .then(function(answer) {
         // based on their answer, either call the bid or the post functions
@@ -88,7 +88,7 @@ function viewAllEmployees() {
     console.log("")
     console.log ("All Current Employess");
     console.log("===============================");
-    connection.query("SELECT * FROM EmployeeTrackerDB.employee", function (err, res) {
+    connection.query("SELECT employee.`first_name` , employee.`last_name` , role.`title` FROM employee ,role WHERE role.`department_id` = employee.`role_id`", function (err, res) {
         if (err) throw err;
         for (let i = 0; i < res.length; i++) {
             console.log(
@@ -96,10 +96,8 @@ function viewAllEmployees() {
                 res[i].first_name +
                 " || Last Name: " +
                 res[i].last_name +
-                " || Role Id: " +
-                res[i].role_id +
-                "||  Manager Id: " +
-                res[i].manager_id
+                " || Job Title: " +
+                res[i].title 
             );
         }
     });
@@ -177,7 +175,7 @@ function addEmployee() {
       {
         name: "roleID",
         type: "input",
-        message: "Enter Role ID"
+        message: "Enter Role ID (See List of Current Job Roles)"
       },
       {
         name: "managerID",
@@ -362,12 +360,12 @@ function updateEmployee() {
       {
         name: "currentRole",
         type: "input",
-        message: "Enter this employee's current job role"
+        message: "Enter this employee's current job role (See Job Role List)"
       },
       {
         name: "newRole",
         type: "input",
-        message: "Enter this employee's new job role"
+        message: "Enter this employee's new job role (See Job Role List)"
       }
     ])
     .then(function(answer) {
