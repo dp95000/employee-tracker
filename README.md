@@ -19,3 +19,6 @@ Once you've completed all the setup instructions, and downloaded all required No
 
 npm start
 
+
+![Application Screenshot](img/screenshot.jpg)
+
